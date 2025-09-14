@@ -16,22 +16,96 @@
     *{box-sizing:border-box}
     body{margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;background:var(--bg);color:#f2f2f2;min-height:100vh;display:flex;flex-direction:column}
     .container{width:96%;max-width:1100px;margin:28px auto;display:flex;flex-direction:column;align-items:center}
-    header{display:flex;align-items:center;justify-content:space-between;gap:16px;width:100%}
+    header{display:flex;align-items:center;justify-content:space-between;gap:16px;width:100%;position:relative;z-index:20}
     .brand{display:flex;align-items:center;gap:12px}
-    nav a{color:var(--muted);text-decoration:none;margin:0 10px;font-weight:600}
+    nav{display:flex;align-items:center;gap:12px;z-index:30}
+    nav a{color:var(--muted);text-decoration:none;font-weight:600}
     nav a:hover{color:var(--accent)}
+
+    /* Overlay background */
+    .overlay{
+      position:fixed;
+      top:0;left:0;right:0;bottom:0;
+      background:rgba(0,0,0,0.4);
+      backdrop-filter:blur(6px);
+      opacity:0;
+      pointer-events:none;
+      transition:opacity 0.3s ease;
+      z-index:10;
+    }
+    .overlay.show{
+      opacity:1;
+      pointer-events:auto;
+    }
+
+    /* Hamburger button */
+    .menu-toggle{
+      display:none;
+      width:30px;
+      height:22px;
+      position:relative;
+      cursor:pointer;
+      -webkit-tap-highlight-color:transparent;
+      z-index:40;
+    }
+    .menu-toggle span{
+      position:absolute;
+      height:3px;
+      width:100%;
+      background:var(--accent);
+      left:0;
+      transition:0.3s ease;
+      border-radius:2px;
+    }
+    .menu-toggle span:nth-child(1){top:0}
+    .menu-toggle span:nth-child(2){top:9px}
+    .menu-toggle span:nth-child(3){top:18px}
+
+    /* Animasi berubah jadi X */
+    .menu-toggle.active span:nth-child(1){
+      transform:rotate(45deg);
+      top:9px;
+    }
+    .menu-toggle.active span:nth-child(2){
+      opacity:0;
+    }
+    .menu-toggle.active span:nth-child(3){
+      transform:rotate(-45deg);
+      top:9px;
+    }
+
     .links{display:flex;align-items:center}
     main{margin-top:32px;display:flex;flex-direction:column;align-items:center;width:100%}
     .hero{background:var(--glass);padding:28px;border-radius:14px;max-width:700px;width:100%;text-align:center}
-    .tag{font-size:13px;color:var(--accent);font-weight:700}
     h1{margin:6px 0;font-size:28px}
     .date{color:var(--muted);font-size:13px}
     .hero-img{max-width:600px;width:100%;border-radius:12px;margin-top:24px;box-shadow:0 6px 18px rgba(0,0,0,0.6);opacity:0;transform:translateY(20px);animation:fadeInUp 1s ease-out forwards}
     @keyframes fadeInUp{to{opacity:1;transform:translateY(0)}}
     footer{margin-top:auto;padding:20px 0;color:var(--muted);font-size:13px;text-align:center;width:100%}
-    .social a{margin:0 8px;color:var(--muted);text-decoration:none}
+
+    /* Mobile */
     @media(max-width:600px){
-      nav{flex-direction:column;align-items:flex-start}
+      .menu-toggle{display:block}
+      nav{
+        display:none;
+        flex-direction:column;
+        align-items:flex-start;
+        background:var(--card);
+        position:absolute;
+        top:60px;
+        right:0;
+        padding:12px;
+        border-radius:10px;
+        box-shadow:0 6px 18px rgba(0,0,0,0.5);
+        opacity:0;
+        transform:translateY(-10px);
+        transition:all 0.3s ease;
+      }
+      nav.show{
+        display:flex;
+        opacity:1;
+        transform:translateY(0);
+      }
       nav a{margin:6px 0}
       h1{font-size:22px}
     }
@@ -46,8 +120,12 @@
           <div style="font-size:12px;color:var(--muted)">ON XRP LEDGER</div>
         </div>
       </div>
-      <nav class="links" aria-label="Main navigation">
-        <a href="https://firstledger.net">FIRSTLEDGER</a>
+      <div class="menu-toggle" id="menu-toggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <nav class="links" id="nav" aria-label="Main navigation">
         <a href="https://xrp.cafe/collection/pandaclubxrp">NFTS</a>
         <a href="https://x.com/PandaClubonXRPL">X</a>
         <a href="https://t.me/pandaclubxrp">TELEGRAM</a>
@@ -66,11 +144,38 @@
       <div style="margin-bottom:8px">© 2025 PANDA CLUB All Rights Reserved</div>
     </footer>
   </div>
+
+  <!-- overlay blur -->
+  <div class="overlay" id="overlay"></div>
+
+  <script>
+    const toggle = document.getElementById('menu-toggle');
+    const nav = document.getElementById('nav');
+    const overlay = document.getElementById('overlay');
+
+    // buka/tutup menu saat klik tombol
+    toggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      nav.classList.toggle('show');
+      toggle.classList.toggle('active');
+      overlay.classList.toggle('show');
+    });
+
+    // tutup menu saat klik link
+    nav.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        nav.classList.remove('show');
+        toggle.classList.remove('active');
+        overlay.classList.remove('show');
+      });
+    });
+
+    // tutup menu saat klik overlay
+    overlay.addEventListener('click', () => {
+      nav.classList.remove('show');
+      toggle.classList.remove('active');
+      overlay.classList.remove('show');
+    });
+  </script>
 </body>
 </html>
-
-
-
-
-
-
